@@ -16,26 +16,6 @@
     <input type="submit">
 </form>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script type="application/javascript">
-    function daco() {
-        $("form#img").submit(function () {
-            var formData = new FormData($(this)[0]);
 
-            $.ajax({
-                url: window.location.pathname + '/categories',
-                type: 'GET',
-                data: formData,
-                success: function (data) {
-                    alert(data)
-                },
-                contentType: false,
-                processData: false
-            });
-
-            return false;
-        });
-    }
-</script>
 </body>
 </html>
