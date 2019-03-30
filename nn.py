@@ -7,10 +7,24 @@ from sklearn.preprocessing import MultiLabelBinarizer
 
 
 def categorize(words):
-    # nn stuff
-    return ['politics', 'captain']
+    raw_test = [str(words).strip().replace('\n', ' ')]
+    predict_input_fn = tf.estimator.inputs.numpy_input_fn({'text': np.array(raw_test).astype(np.str)},
+                                                          shuffle=False)
+    results = estimator.predict(predict_input_fn)
+
+    arr = []
+    for result in results:
+        probs = result['probabilities']
+        prob = probs.argsort()[::-1]
+        for category in prob:
+            text_category = encoder.classes_[category]
+            arr.append(f'''{text_category}: {str(round(probs[category] * 100, 2))}%''')
+
+    print(arr)
+    return arr
 
 
+# TODO replace with actual data
 data = pd.DataFrame({
     'text': [
         '''Led by Woody, Andy's toys live happily in his room until Andy's birthday brings Buzz Lightyear onto the scene. Afraid of losing his place in Andy's heart, Woody plots against Buzz. But when circumstan...''',
@@ -64,23 +78,3 @@ estimator = tf.estimator.DNNEstimator(
 )
 
 estimator.train(input_fn=train_input_fn)
-
-#############################
-raw_test = [
-    "An examination of our dietary choices and the food we put in our bodies. Based on Jonathan Safran Foer's memoir.",
-    # Documentary
-    "A teenager tries to survive the last week of her disastrous eighth-grade year before leaving to start high school.",
-    # Comedy
-    "Ethan Hunt and his IMF team, along with some familiar allies, race against time after a mission gone wrong."
-    # Action, Adventure
-]
-
-predict_input_fn = tf.estimator.inputs.numpy_input_fn({'text': np.array(raw_test).astype(np.str)},
-                                                      shuffle=False)
-results = estimator.predict(predict_input_fn)
-
-for movie_genres in results:
-    top_2 = movie_genres['probabilities'].argsort()[-2:][::-1]
-    for genre in top_2:
-        text_genre = encoder.classes_[genre]
-        print(text_genre + ': ' + str(round(movie_genres['probabilities'][genre] * 100, 2)) + '%')
