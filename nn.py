@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import tensorflow_hub as hub
+import yaml
+import yamlordereddictloader
 
 from sklearn.preprocessing import MultiLabelBinarizer
 
@@ -24,18 +26,23 @@ def categorize(words):
     return arr
 
 
-# TODO replace with actual data
-data = pd.DataFrame({
-    'text': [
-        '''Led by Woody, Andy's toys live happily in his room until Andy's birthday brings Buzz Lightyear onto the scene. Afraid of losing his place in Andy's heart, Woody plots against Buzz. But when circumstan...''',
-        '''When siblings Judy and Peter discover an enchanted board game that opens the door to a magical world, they unwittingly invite Alan -- an adult who's been trapped inside the game for 26 years -- into t...''',
-        '''A family wedding reignites the ancient feud between next-door neighbors and fishing buddies John and Max. Meanwhile, a sultry Italian divorcée opens a restaurant at the local bait shop, alarming the l...'''],
-    'categories': [
-        ['Adventure', 'Fantasy', 'Family'],
-        ['Romance', 'Comedy'],
-        ['Comedy', 'Drama', 'Romance']
-    ]
-}, columns=['text', 'categories'])
+def read_data():
+    text = []
+    categories = []
+
+    with open("meeeeeem.yaml") as f:
+        yaml_data = yaml.load(f, Loader=yamlordereddictloader.Loader)
+        for mem in yaml_data:
+            text.append(mem)
+            categories.append(yaml_data[mem])
+
+    return {
+        'text': text,
+        'categories': categories
+    }
+
+
+data = pd.DataFrame(read_data(), columns=['text', 'categories'])
 
 text = data['text']
 categories = data['categories']
@@ -78,3 +85,4 @@ estimator = tf.estimator.DNNEstimator(
 )
 
 estimator.train(input_fn=train_input_fn)
+categorize('We must do the homework, but we hates it!!!:')
