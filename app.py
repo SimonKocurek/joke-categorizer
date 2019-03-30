@@ -10,13 +10,12 @@ def index():
     return app.send_static_file('index.html')
 
 
-@app.route('/categories')
+@app.route('/categories', methods=['GET', 'POST'])
 def categories():
-    img = request.files.get('img')
+    img = request.files.get('file')
     words = get_words(img)
     ctg = categorize(words)
     return jsonify(ctg)
-
 
 @app.route('/categoriesUrl')
 def categoriesurl():
