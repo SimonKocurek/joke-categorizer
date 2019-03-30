@@ -1,11 +1,7 @@
-import os
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 import tensorflow_hub as hub
-import json
-import pickle
-import urllib
 
 from sklearn.preprocessing import MultiLabelBinarizer
 
@@ -15,24 +11,24 @@ def categorize(words):
     return ['politics', 'captain']
 
 
-data = pd.read_csv('movies_metadata.csv')
-data.head()
+data = pd.DataFrame({
+    'text': [
+        '''Led by Woody, Andy's toys live happily in his room until Andy's birthday brings Buzz Lightyear onto the scene. Afraid of losing his place in Andy's heart, Woody plots against Buzz. But when circumstan...''',
+        '''When siblings Judy and Peter discover an enchanted board game that opens the door to a magical world, they unwittingly invite Alan -- an adult who's been trapped inside the game for 26 years -- into t...''',
+        '''A family wedding reignites the ancient feud between next-door neighbors and fishing buddies John and Max. Meanwhile, a sultry Italian divorcée opens a restaurant at the local bait shop, alarming the l...'''],
+    'categories': [
+        ['Adventure', 'Fantasy', 'Family'],
+        ['Romance', 'Comedy'],
+        ['Comedy', 'Drama', 'Romance']
+    ]
+}, columns=['text', 'categories'])
 
-descriptions = data['overview']
-genres = data['genres']
-
-train_size = int(len(descriptions) * .9)
-
-train_descriptions = descriptions[:train_size].astype('str')
-train_genres = genres[:train_size]
-
-test_descriptions = descriptions[train_size:].astype('str')
-test_genres = genres[train_size:]
+text = data['text']
+categories = data['categories']
 
 encoder = MultiLabelBinarizer()
-encoder.fit_transform(train_genres)
-train_encoded = encoder.transform(train_genres)
-test_encoded = encoder.transform(test_genres)
+encoder.fit_transform(categories)
+train_encoded = encoder.transform(categories)
 num_classes = len(encoder.classes_)
 
 multi_label_head = tf.contrib.estimator.multi_label_head(
@@ -41,15 +37,15 @@ multi_label_head = tf.contrib.estimator.multi_label_head(
 )
 
 # takes time
-description_embeddings = hub.text_embedding_column(
-    "descriptions",
+text_embeddings = hub.text_embedding_column(
+    "text",
     module_spec="https://tfhub.dev/google/universal-sentence-encoder/2",
     trainable=False
 )
 
 # Format our data for the numpy_input_fn
 features = {
-    "descriptions": np.array(train_descriptions).astype(np.str)
+    "text": np.array(text).astype(np.str)
 }
 labels = np.array(train_encoded).astype(np.int32)
 
@@ -64,17 +60,12 @@ train_input_fn = tf.estimator.inputs.numpy_input_fn(
 estimator = tf.estimator.DNNEstimator(
     head=multi_label_head,
     hidden_units=[64, 10],
-    feature_columns=[description_embeddings]
+    feature_columns=[text_embeddings]
 )
 
 estimator.train(input_fn=train_input_fn)
 
 #############################
-
-eval_input_fn = tf.estimator.inputs.numpy_input_fn({"descriptions": np.array(test_descriptions).astype(np.str)},
-                                                   test_encoded.astype(np.int32), shuffle=False)
-estimator.evaluate(input_fn=eval_input_fn)
-
 raw_test = [
     "An examination of our dietary choices and the food we put in our bodies. Based on Jonathan Safran Foer's memoir.",
     # Documentary
@@ -84,9 +75,8 @@ raw_test = [
     # Action, Adventure
 ]
 
-predict_input_fn = tf.estimator.inputs.numpy_input_fn({"descriptions": np.array(raw_test).astype(np.str)},
+predict_input_fn = tf.estimator.inputs.numpy_input_fn({'text': np.array(raw_test).astype(np.str)},
                                                       shuffle=False)
-
 results = estimator.predict(predict_input_fn)
 
 for movie_genres in results:
