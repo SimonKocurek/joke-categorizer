@@ -1,7 +1,0 @@
-GET http://localhost:5000/categories
-Accept: application/json
-
-<> 2019-03-30T024012.200.json
-
-###
-
