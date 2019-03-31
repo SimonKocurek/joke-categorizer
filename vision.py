@@ -1,10 +1,9 @@
-import base64
-import os
+
 
 from google.cloud import vision
 from google.oauth2 import service_account
 
-from app import HOMEDIR
+
 
 GOOGLE_CLOUD_PROJECT = "joke-categorizer"
 GOOGLE_APPLICATION_CREDENTIALS = service_account.Credentials.from_service_account_file('./auth.json')
