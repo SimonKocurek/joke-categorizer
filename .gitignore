@@ -107,3 +107,6 @@ venv.bak/
 .idea/
 
 frontend/node_modules
+
+data/
+json/

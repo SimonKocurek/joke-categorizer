@@ -1,14 +1,14 @@
 import os
 
 from flask import Flask, jsonify, request
-from vision import get_words, get_words_url
+from flask_cors import cross_origin  # flask-Cors
 
 from image import get_gallery
 from nn import categorize
-from vision import get_words,get_words_url
+from vision import get_words, get_words_url
 
-HOMEDIR = "C:\\Users\\domin\\memes"
-JSONS = "C:\\Users\\domin\\jsons"
+HOMEDIR = "data"
+JSONS = "json"
 img_id = 1
 app = Flask(__name__, static_url_path='/static')
 
@@ -25,9 +25,9 @@ def categories():
     ctg = categorize(words)
     filename = img.filename
     img.save(os.path.join(HOMEDIR, filename))
-    filename = os.path.join(os.path.splitext(filename)[0], '.json')
-    json = open(filename,'w+')
-    json.write(jsonify(ctg))
+    filename = os.path.splitext(filename)[0] + '.json'
+    json = open(os.path.join(JSONS, filename), 'w+')
+    json.write(str(ctg))
     return jsonify(ctg)
 
 
@@ -42,11 +42,11 @@ def categoriesurl():
     img_data = requests.get(img).content
     filename = 'image' + str(img_id)
     img_id += 1
-    with open(os.path.join(HOMEDIR,filename+'.jpg'), 'wb') as handler:
+    with open(os.path.join(HOMEDIR, filename + '.jpg'), 'wb') as handler:
         handler.write(img_data)
-    filename = os.path.join(JSONS,filename + '.json')
+    filename = os.path.join(JSONS, filename + '.json')
     json = open(filename, 'w+')
-    json.write(jsonify(ctg))
+    json.write(str(ctg))
     return jsonify(ctg)
 
 
@@ -57,7 +57,7 @@ def send_image(path):
 
 @app.route('/listimages')
 def list():
-    list = get_gallery(HOMEDIR,JSONS)
+    list = get_gallery(HOMEDIR, JSONS)
     return jsonify(list)
 
 
