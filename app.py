@@ -12,6 +12,11 @@ JSONS = "./static/jsons"
 img_id = 1
 app = Flask(__name__, static_url_path='/static')
 
+try:
+    os.mkdir(HOMEDIR)
+    os.mkdir(JSONS)
+except FileExistsError:
+    pass
 
 @app.route('/')
 def index():
@@ -55,7 +60,7 @@ def send_image(path):
 
 
 @app.route('/listimages')
-def list():
+def l():
     list = get_gallery(HOMEDIR, JSONS)
     return jsonify(list)
 

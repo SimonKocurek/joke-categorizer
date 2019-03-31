@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <title>W3.CSS Template</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,6 +30,7 @@
     }
 
     .company {
+        overflow: auto;
         position: relative;
         width: calc(100% / 2 - 1rem);
         display: inline-flex;
@@ -113,10 +114,8 @@
     }
 
     .company__details {
-        display: flex;
-        justify-content: space-between;
         margin-top: 1.5rem;
-        padding: 0.5rem 0.75rem;
+        padding: 5px 30px;
         background-color: rgba(197, 208, 209, 0.1);
         border-top: 1px solid #c5d0d1;
     }
@@ -144,6 +143,92 @@
         bottom: 0;
         top: 0;
     }
+
+    img {
+        max-width: 240px;
+        max-height: 160px;
+    }
+
+    .js .inputfile {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+
+    .inputfile + label {
+        max-width: 80%;
+        font-size: 1.25rem;
+        /* 20px */
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: pointer;
+        display: inline-block;
+        overflow: hidden;
+        padding: 0.625rem 1.25rem;
+        /* 10px 20px */
+    }
+
+    .no-js .inputfile + label {
+        display: none;
+    }
+
+    .inputfile:focus + label,
+    .inputfile.has-focus + label {
+        outline: 1px dotted #000;
+        outline: -webkit-focus-ring-color auto 5px;
+    }
+
+    .inputfile + label * {
+        /* pointer-events: none; */
+        /* in case of FastClick lib use */
+    }
+
+    .inputfile + label svg {
+        width: 1em;
+        height: 1em;
+        vertical-align: middle;
+        fill: currentColor;
+        margin-top: -0.25em;
+        /* 4px */
+        margin-right: 0.25em;
+        /* 4px */
+    }
+
+    .inputfile-4 + label {
+        color: #2196f3;
+    }
+
+    .inputfile-4:focus + label,
+    .inputfile-4.has-focus + label,
+    .inputfile-4 + label:hover {
+        color: #1d79c8;
+    }
+
+    .inputfile-4 + label figure {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #2196f3;
+        display: block;
+        padding: 20px;
+        margin: 0 auto 10px;
+    }
+
+    .inputfile-4:focus + label figure,
+    .inputfile-4.has-focus + label figure,
+    .inputfile-4 + label:hover figure {
+        background-color: #1d79c8;
+    }
+
+    .inputfile-4 + label svg {
+        width: 100%;
+        height: 100%;
+        fill: #f1e5e6;
+    }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <body>
@@ -158,9 +243,9 @@
             <h3 class="w3-padding-64"><b>Meme<br>Categorizer</b></h3>
         </div>
         <div class="w3-bar-block">
-            <a v-for="(enabled, category) in categories" onclick="w3_close()" v-on:click="changeEnabled(category)"
-               class="w3-bar-item w3-button w3-hover-white">{{
-                enabledSign(enabled) + capitalized(category) }}</a>
+            <a v-for="category in categories" onclick="w3_close()" v-on:click="changeEnabled(category)"
+               class="w3-bar-item w3-button w3-hover-white">{{ enabledSign(category.enabled) }}{{ capitalized(category)
+                }}</a>
         </div>
     </nav>
 
@@ -172,38 +257,36 @@
     <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu"
          id="myOverlay"></div>
 
-    <div class="w3-main" style="margin-top: 80px;margin-left: 400px;margin-right: 100px;flex: 1;">
-
-        <div class="w3-container" style="margin-top:75px">
-            <form action="/categories" method="post" enctype="multipart/form-data">
-                <input type="file" id="file" name="file">
-                <input type="submit">
-            </form>
-        </div>
+    <div class="w3-main" style="margin-top: 80px;margin-left: 370px;margin-right: 60px;flex: 1;">
 
         <transition-group name="company" tag="ul" class="content__list">
-            <li class="company" v-for="meme in memes" :key="meme.name">
+            <li class="company" :key="'adder'">
                 <div class="company__info">
-                    {{ meme.url }}
-                    {{ meme.categories }}
-                    <!--                    <icon class="company__logo" :style="`fill:${company.color}`" :use="company.logo"></icon>-->
-                    <!--                    <h2 class="company__name">{{ company.name }}</h2>-->
-                    <!--                    <blockquote class="company__slogan">{{ company.slogan }}</blockquote>-->
-                    Meme
+                    <form action="/categories" method="post" id="form" enctype="multipart/form-data">
+                        <input type="file" name="file" id="file" class="inputfile inputfile-4"
+                               data-multiple-caption="{count} files selected" multiple="">
+                        <label for="file">
+                            <figure>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17">
+                                    <path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z"></path>
+                                </svg>
+                            </figure>
+                            <span>Upload new meme…</span></label>
+                    </form>
                 </div>
 
                 <ul class="company__details">
-                    <li class="company__data">
-                        <label class="company__label">Country</label>
-                        <!--                        <p class="company__country"-->
-                        <!--                           @click="clearFilter('countries', company.country)">-->
-                        <!--                            {{ company.country }}-->
-                        <!--                        </p>-->
-                    </li>
+                </ul>
+            </li>
 
-                    <li class="company__data">
-                        <label class="company__label">Rating</label>
-                        <!--                        <p class="company__rating">{{ company.rating.toFixed(1) }}</p>-->
+            <li class="company" v-for="meme in filteredMemes" :key="meme.url">
+                <div class="company__info">
+                    <img v-bind:src="imageUrl(meme.url)">
+                </div>
+
+                <ul class="company__details">
+                    <li class="company__data" v-for="category in meme.categories">
+                        <label class="company__label">{{ category }}</label>
                     </li>
                 </ul>
             </li>
@@ -215,6 +298,7 @@
         Made during <a href="https://hackkosice.com" target="_blank"
                        class="w3-hover-opacity">Hack Kosice</a></p></div>
 </div>
+<script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
 <script>
     // Script to open and close sidebar
     function w3_open() {
@@ -235,51 +319,73 @@
         captionText.innerHTML = element.alt;
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        new Vue({
-            el: '#app',
-            data: {
-                categories: {},
-                memes: []
+    new Vue({
+        el: '#app',
+        data: {
+            categories: [],
+            memes: []
+        },
+        methods: {
+            capitalized: function (word) {
+                if (!word['tag']) {
+                    return '';
+                }
+                return word['tag'].charAt(0).toUpperCase() + word['tag'].slice(1);
             },
-            methods: {
-                capitalized: function (word) {
-                    if (!word) {
-                        return '';
-                    }
-                    return word.charAt(0).toUpperCase() + word.slice(1);
-                },
 
-                enabledSign: function (enabled) {
-                    if (enabled) {
-                        return '•';
-                    } else {
-                        return '';
-                    }
-                },
-
-                changeEnabled: function (changed) {
-                    changed.enabled = !changed.enabled;
-                },
+            enabledSign: function (enabled) {
+                if (enabled) {
+                    return '•  ';
+                } else {
+                    return '   ';
+                }
             },
-            beforeMount() {
-                fetch('http://127.0.0.1:5000/listimages')
-                    .then(response => {
-                        var files = response.files;
-                        files.forEach(file => {
-                            this.memes.push({
-                                'url': file.path,
-                                'categories': file.tags || []
-                            });
 
-                            if (file.tags) {
-                                file.tags.forEach(tag => this.categories[tag] = false);
+            changeEnabled: function (changed) {
+                changed['enabled'] = !changed['enabled'];
+            },
+
+            imageUrl: function (url) {
+                return `http://127.0.0.1:5000/static/memes/${url}`
+            }
+        },
+        computed: {
+            filteredMemes: function () {
+                var none = this.categories.filter(a => a.enabled).length === 0;
+                if (none) {
+                    return this.memes;
+                }
+
+                var b = this.categories.filter(a => a.enabled);
+                return this.memes.filter(a => {
+                    return b.every(cat => {
+                        return a.categories.find(c => c === cat.tag);
+                    })
+                });
+            }
+        },
+        beforeMount() {
+            fetch('http://127.0.0.1:5000/listimages')
+                .then(res => res.json())
+                .then(res => {
+                    var files = res['files'];
+                    files.forEach(file => {
+                        categories = file['tags'] ? JSON.parse(file['tags'].replace(/'/g, '\"')) : [];
+
+                        this.memes.push({
+                            'url': file['path'],
+                            'categories': categories
+                        });
+
+                        categories.forEach(tag => {
+                            if (this.categories.filter(a => a.tag === tag).length === 0) {
+                                this.categories.push({tag: tag, enabled: false})
                             }
                         });
                     });
-            }
-        });
-    })
+                });
+        }
+    });
 </script>
 
 </body>
