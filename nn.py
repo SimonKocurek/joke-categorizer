@@ -19,10 +19,15 @@ def categorize(words):
         probs = result['probabilities']
         prob = probs.argsort()[::-1]
         for category in prob:
-            text_category = encoder.classes_[category]
-            arr.append(f'''{text_category}: {str(round(probs[category] * 100, 2))}%''')
+            if probs[category] < 0.7:
+                continue
 
-    print(arr)
+            text_category = encoder.classes_[category]
+            arr.append(text_category)
+
+        if len(arr) < 1:
+            arr.append(encoder.classes_[prob[0]])
+
     return arr
 
 
@@ -64,7 +69,6 @@ text_embeddings = hub.text_embedding_column(
     trainable=False
 )
 
-# Format our data for the numpy_input_fn
 features = {
     "text": np.array(text).astype(np.str)
 }
@@ -73,9 +77,9 @@ labels = np.array(train_encoded).astype(np.int32)
 train_input_fn = tf.estimator.inputs.numpy_input_fn(
     features,
     labels,
-    shuffle=False,
-    batch_size=32,
-    num_epochs=100
+    shuffle=True,
+    batch_size=5,
+    num_epochs=650
 )
 
 estimator = tf.estimator.DNNEstimator(
@@ -85,4 +89,3 @@ estimator = tf.estimator.DNNEstimator(
 )
 
 estimator.train(input_fn=train_input_fn)
-categorize('We must do the homework, but we hates it!!!:')
