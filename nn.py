@@ -27,7 +27,7 @@ def categorize(words):
             arr.append(text_category)
 
         if len(arr) < 1:
-            arr.append(encoder.classes_[prob[0]])
+            arr.append('Unknown')
 
     return arr
 
@@ -80,12 +80,12 @@ train_input_fn = tf.estimator.inputs.numpy_input_fn(
     labels,
     shuffle=True,
     batch_size=10,
-    num_epochs=1400
+    num_epochs=2500
 )
 
 estimator = tf.estimator.DNNEstimator(
     head=multi_label_head,
-    hidden_units=[28, 24],
+    hidden_units=[30, 24],
     feature_columns=[text_embeddings]
 )
 
