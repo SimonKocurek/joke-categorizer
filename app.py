@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, jsonify, request
+from vision import get_words, get_words_url
 
 from image import get_gallery
 from nn import categorize
@@ -28,6 +29,7 @@ def categories():
     json = open(filename,'w+')
     json.write(jsonify(ctg))
     return jsonify(ctg)
+
 
 @app.route('/categoriesUrl')
 def categoriesurl():

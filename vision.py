@@ -10,8 +10,6 @@ GOOGLE_APPLICATION_CREDENTIALS = service_account.Credentials.from_service_accoun
 client = vision.ImageAnnotatorClient(credentials=GOOGLE_APPLICATION_CREDENTIALS)
 
 def get_words(img):
-    # daco....
-
     content = img.read()
     resp = client.annotate_image(
         {'image': {'content': content}, 'features': [{'type': 'TEXT_DETECTION'}]})
