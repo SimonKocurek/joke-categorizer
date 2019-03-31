@@ -1,7 +1,7 @@
 import os,pickle
 
 from flask import Flask, jsonify, request
-from flask_cors import cross_origin  # flask-Cors
+from werkzeug.utils import secure_filename
 
 from image import get_gallery
 from nn import categorize
@@ -9,7 +9,6 @@ from vision import get_words, get_words_url
 
 HOMEDIR = "./static/memes"
 JSONS = "./static/jsons"
-img_id = 1
 app = Flask(__name__, static_url_path='/static')
 
 try:
@@ -38,16 +37,14 @@ def categories():
 
 @app.route('/categoriesUrl')
 def categoriesurl():
-    global img_id
     img = request.form.get('img')
     words = get_words_url(img)
     ctg = categorize(words)
     import requests
 
     img_data = requests.get(img).content
-    filename = 'image' + str(img_id)
-    img.save(os.path.join(HOMEDIR, filename) + '.jpg')
-    img_id += 1
+    filename = secure_filename(img)
+    img_data.save(os.path.join(HOMEDIR, filename) + '.jpg')
     filename = os.path.join(JSONS,filename + '.json')
     json = open(filename, 'w+')
     json.write(str(ctg))
