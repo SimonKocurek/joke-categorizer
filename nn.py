@@ -19,6 +19,7 @@ def categorize(words):
         probs = result['probabilities']
         prob = probs.argsort()[::-1]
         for category in prob:
+            print(encoder.classes_[category], probs[category])
             if probs[category] < 0.7:
                 continue
 
@@ -78,13 +79,13 @@ train_input_fn = tf.estimator.inputs.numpy_input_fn(
     features,
     labels,
     shuffle=True,
-    batch_size=5,
-    num_epochs=500
+    batch_size=10,
+    num_epochs=400
 )
 
 estimator = tf.estimator.DNNEstimator(
     head=multi_label_head,
-    hidden_units=[10],
+    hidden_units=[4, 4],
     feature_columns=[text_embeddings]
 )
 

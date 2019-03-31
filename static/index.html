@@ -30,7 +30,6 @@
     }
 
     .company {
-        overflow: auto;
         position: relative;
         width: calc(100% / 2 - 1rem);
         display: inline-flex;
@@ -145,11 +144,20 @@
     }
 
     img {
-        max-width: 240px;
+        max-width: 175px;
         max-height: 160px;
     }
 
     .js .inputfile {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+
+    .inputfile {
         width: 0.1px;
         height: 0.1px;
         opacity: 0;
@@ -298,7 +306,6 @@
         Made during <a href="https://hackkosice.com" target="_blank"
                        class="w3-hover-opacity">Hack Kosice</a></p></div>
 </div>
-<script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
 <script>
     // Script to open and close sidebar
     function w3_open() {
@@ -318,6 +325,18 @@
         var captionText = document.getElementById("caption");
         captionText.innerHTML = element.alt;
     }
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        var inputs = document.querySelectorAll('.inputfile');
+        Array.prototype.forEach.call(inputs, function (input) {
+            var label = input.nextElementSibling,
+                labelVal = label.innerHTML;
+
+            input.addEventListener('change', function (e) {
+                document.forms['form'].submit();
+            });
+        });
+    });
 
     new Vue({
         el: '#app',
