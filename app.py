@@ -1,4 +1,4 @@
-import os
+import os,pickle
 
 from flask import Flask, jsonify, request
 
@@ -6,8 +6,8 @@ from image import get_gallery
 from nn import categorize
 from vision import get_words,get_words_url
 
-HOMEDIR = "C:\\Users\\domin\\memes"
-JSONS = "C:\\Users\\domin\\jsons"
+HOMEDIR = "./static/memes"
+JSONS = "./static/jsons"
 img_id = 1
 app = Flask(__name__, static_url_path='/static')
 
@@ -19,14 +19,14 @@ def index():
 
 @app.route('/categories', methods=['GET', 'POST'])
 def categories():
-    img = request.files.get('file')
-    words = get_words(img)
-    ctg = categorize(words)
+    img = request.files['file']
     filename = img.filename
     img.save(os.path.join(HOMEDIR, filename))
-    filename = os.path.join(os.path.splitext(filename)[0], '.json')
-    json = open(filename,'w+')
-    json.write(jsonify(ctg))
+    words = get_words(os.path.join(HOMEDIR, filename))
+    ctg = categorize(words)
+    filename = os.path.join(JSONS,os.path.splitext(filename)[0] + '.json')
+    with open(filename,'w+') as json:
+        json.write(str(ctg))
     return jsonify(ctg)
 
 @app.route('/categoriesUrl')
@@ -35,16 +35,14 @@ def categoriesurl():
     img = request.form.get('img')
     words = get_words_url(img)
     ctg = categorize(words)
-    import requests
 
-    img_data = requests.get(img).content
+
     filename = 'image' + str(img_id)
+    img.save(os.path.join(HOMEDIR, filename) + '.jpg')
     img_id += 1
-    with open(os.path.join(HOMEDIR,filename+'.jpg'), 'wb') as handler:
-        handler.write(img_data)
     filename = os.path.join(JSONS,filename + '.json')
     json = open(filename, 'w+')
-    json.write(jsonify(ctg))
+    json.write(str(ctg))
     return jsonify(ctg)
 
 

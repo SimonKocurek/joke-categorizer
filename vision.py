@@ -12,10 +12,11 @@ client = vision.ImageAnnotatorClient(credentials=GOOGLE_APPLICATION_CREDENTIALS)
 def get_words(img):
     # daco....
 
-    content = img.read()
+    image = open(img,'rb')
+    content =image.read()
     resp = client.annotate_image(
         {'image': {'content': content}, 'features': [{'type': 'TEXT_DETECTION'}]})
-    return
+    return resp.full_text_annotation.text
 
 def get_words_url(url):
     image = vision.types.Image()

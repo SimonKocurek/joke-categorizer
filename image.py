@@ -10,8 +10,8 @@ def get_gallery(homedir,jsons):
         for file in files:
             item = {}
             item['path'] = file
-            tags = open(os.path.join(jsons,os.path.join(os.path.splitext(file)[0], '.json')))
-            item['tags'] = tags
+            tags = open(os.path.join(jsons,os.path.splitext(file)[0] + '.json'))
+            item['tags'] = tags.read()
             filelist.append(item)
 
     json['files'] = filelist
