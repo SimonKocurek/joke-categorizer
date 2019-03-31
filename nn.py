@@ -80,12 +80,12 @@ train_input_fn = tf.estimator.inputs.numpy_input_fn(
     labels,
     shuffle=True,
     batch_size=10,
-    num_epochs=10000
+    num_epochs=1400
 )
 
 estimator = tf.estimator.DNNEstimator(
     head=multi_label_head,
-    hidden_units=[10, 6],
+    hidden_units=[28, 24],
     feature_columns=[text_embeddings]
 )
 
